@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Santé sexulle</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background:#f4f6f9;
+    margin:0;
+    padding:20px;
+    color:#333;
+}
+
+.container{
+    max-width:900px;
+    margin:auto;
+    background:white;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.10);
+}
+
+h1{
+    text-align:center;
+    color:#005a9c;
+}
+
+.subtitle{
+    text-align:center;
+    color:#666;
+    margin-bottom:30px;
+}
+
+.question-counter{
+    font-weight:bold;
+    color:#005a9c;
+    margin-bottom:15px;
+}
+
+.question{
+    font-size:1.3em;
+    margin-bottom:20px;
+    line-height:1.5;
+}
+
+.button-container{
+    display:flex;
+    gap:15px;
+    flex-wrap:wrap;
+}
+
+button{
+    border:none;
+    border-radius:8px;
+    padding:12px 25px;
+    cursor:pointer;
+    font-size:1em;
+}
+
+.btn-true{
+    background:#28a745;
+    color:white;
+}
+
+.btn-false{
+    background:#dc3545;
+    color:white;
+}
+
+.btn-next{
+    background:#005a9c;
+    color:white;
+    margin-top:15px;
+    display:none;
+}
+
+.feedback{
+    display:none;
+    margin-top:20px;
+    padding:15px;
+    border-radius:8px;
+    line-height:1.6;
+}
+
+.correct{
+    background:#d4edda;
+    border-left:6px solid #28a745;
+}
+
+.incorrect{
+    background:#f8d7da;
+    border-left:6px solid #dc3545;
+}
+
+.resultats{
+    display:none;
+}
+
+.score{
+    text-align:center;
+    font-size:2em;
+    color:#005a9c;
+    margin:20px 0;
+}
+
+.debat{
+    background:#eef6ff;
+    padding:15px;
+    border-radius:10px;
+    margin-top:20px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>🩺 Quiz Santé sexuelle</h1>
+
+<p class="subtitle">
+Testez vos connaissances, déconstruisez les idées reçues et échangeons ensemble.
+</p>
+
+<div id="quiz">
+
+<div class="question-counter" id="counter"></div>
+
+<div class="question" id="question"></div>
+
+<div class="button-container">
+<button class="btn-true" onclick="repondre(true)">Vrai</button>
+<button class="btn-false" onclick="repondre(false)">Faux</button>
+</div>
+
+<div id="feedback" class="feedback"></div>
+
+<button id="nextBtn" class="btn-next" onclick="questionSuivante()">
+Question suivante
+</button>
+
+</div>
+
+<div id="resultats" class="resultats">
+
+<h2>🎉 Résultat final</h2>
+
+<div class="score" id="score"></div>
+
+<div class="debat">
+<h3>Questions pour poursuivre les échanges</h3>
+<ul>
+<li>Quelle réponse vous a le plus surpris ?</li>
+<li>Quelles idées reçues entendez-vous le plus souvent ?</li>
+<li>Quels freins existent concernant le dépistage ?</li>
+<li>Où trouver des informations fiables sur la santé sexuelle ?</li>
+<li>Comment favoriser le dialogue autour du consentement et de la prévention ?</li>
+</ul>
+</div>
+
+<br>
+
+<button class="btn-next" style="display:inline-block;" onclick="location.reload()">
+Recommencer le quiz
+</button>
+
+</div>
+
+</div>
+
+<script>
+
+const quiz = [
+
+{
+question:"On peut avoir une IST sans présenter de symptômes.",
+answer:true,
+explication:"✅ Vrai.<br><br>Certaines IST comme la chlamydiose ou le papillomavirus peuvent rester longtemps sans symptômes. Le dépistage reste donc essentiel."
+},
+
+
+{
+question:" En France, je peux bénéficier d’un dépistage gratuit, mais je dois obligatoirement donner mon identité.",
+answer:false,
+explication:"✅ Faux.<br><br> Les centres gratuits d'information, de dépistage et de diagnostic des IST, du VIH  et des hépatites (CeGIDD) permettent effectivement d'accéder à un dépistage totalement gratuit mais celui-ci est anonyme par défaut (ou nominatif si on donne son consentement, mais toujours confidentiel)."
+},
+
+{
+question:"Le préservatif n'est pas le seul moyen contraceptif qui protège contre la plupart des IST.",
+answer:false,
+explication:"✅ Faux.<br><br>Seuls, le préservatif externe ou interne et la digue dentaire protègent contre de nombreuses IST tout en limitant les risques de grossesse non prévue."
+},
+
+{
+question:"Le consentement dans le cadre de la vie intime et affective peut être retiré à tout moment.",
+answer:true,
+explication:"✅ Vrai.<br><br>Le consentement doit être libre, éclairé et réversible à tout moment."
+},
+
+
+{
+question:" L'incidence des IST est en baisse en France ces dernières années. ",
+answer:false,
+explication:"✅ Faux.<br><br> Si l'incidence par rapport aux nouveaux cas de VIH est stable depuis plusieurs années, les IST bactériennes, particulièrement la chlamydiose et la gonorrhée sont en hausses, particulièrement chez les jeunes."
+},
+
+
+{
+question:"Une personne sous traitement efficace avec une charge virale VIH indétectable ne transmet pas le VIH par voie sexuelle.",
+answer:true,
+explication:"✅ Vrai.<br><br>Ce principe est connu sous le nom 'Indétectable = Intransmissible (I=I)'. Par ailleurs, il convient de rappeler que les gestes de la vie quotidiennes ne peuvent pas transmette le VIH."
+},
+
+{
+question:" Un test de dépistage du VIH réalisé par prise de sang en laboratoire (test de 4ᵉ génération) est considéré comme fiable 3 semaines après une prise de risque. ",
+answer:false,
+explication:"✅ Faux.<br><br> Un test VIH de 4ᵉ génération n'est pas considéré comme totalement fiable à 3 semaines après une prise de risque. Il faut attendre 6 semaines après la dernière exposition pour qu'un résultat négatif permette d'exclure une infection par le VIH, en l'absence de nouvelle prise de risque et de traitement pouvant modifier le délai de dépistage.<br><br><strong>"
+
+},
+
+{
+question:" En France, les jeunes de moins de 26 ans peuvent obtenir gratuitement des préservatifs en pharmacie, sans ordonnance.",
+answer:true,
+explication:"✅ Vrai.<br><br> Les moins de 26 ans peuvent bénéficier gratuitement de certaines marques de préservatifs prises en charge par l’Assurance maladie, sans ordonnance, en pharmacie.<br><br><strong>"
+},
+
+
+
+
+];
+
+let index = 0;
+let score = 0;
+
+function afficherQuestion(){
+
+document.getElementById("counter").innerHTML =
+"Question " + (index + 1) + " / " + quiz.length;
+
+document.getElementById("question").innerHTML =
+quiz[index].question;
+
+document.getElementById("feedback").style.display = "none";
+document.getElementById("nextBtn").style.display = "none";
+}
+
+function repondre(reponse){
+
+const q = quiz[index];
+
+let feedback = document.getElementById("feedback");
+
+if(reponse === q.answer){
+
+score++;
+
+feedback.className = "feedback correct";
+
+feedback.innerHTML =
+"<strong>Bonne réponse !</strong><br><br>" +
+q.explication;
+
+}else{
+
+feedback.className = "feedback incorrect";
+
+feedback.innerHTML =
+"<strong>Ce n'est pas la bonne réponse.</strong><br><br>" +
+q.explication;
+}
+
+feedback.style.display = "block";
+document.getElementById("nextBtn").style.display = "inline-block";
+}
+
+function questionSuivante(){
+
+index++;
+
+if(index < quiz.length){
+
+afficherQuestion();
+
+}
+else{
+
+document.getElementById("quiz").style.display = "none";
+document.getElementById("resultats").style.display = "block";
+
+let message = "";
+
+if(score >= 7){
+message = "Excellent niveau de connaissance !";
+}
+else if(score >= 6){
+message = "Très bon niveau de connaissance.";
+}
+else if(score >= 4){
+message = "De bonnes bases et encore quelques idées reçues à déconstruire.";
+}
+else{
+message = "L'occasion d'en apprendre davantage aujourd'hui !";
+}
+
+document.getElementById("score").innerHTML =
+score + " / " + quiz.length +
+"<br><small>" + message + "</small>";
+}
+}
+
+afficherQuestion();
+
+</script>
+
+</body>
+</html>
